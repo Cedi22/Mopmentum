@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b22404x7ob1so"
+path="res://.godot/imported/framed_painting.obj-e7d2e1c19a0e5ab47ccad87db60d07f5.mesh"
+
+[deps]
+
+files=["res://.godot/imported/framed_painting.obj-e7d2e1c19a0e5ab47ccad87db60d07f5.mesh"]
+
+source_file="res://assets/models/framed_painting.obj"
+dest_files=["res://.godot/imported/framed_painting.obj-e7d2e1c19a0e5ab47ccad87db60d07f5.mesh", "res://.godot/imported/framed_painting.obj-e7d2e1c19a0e5ab47ccad87db60d07f5.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

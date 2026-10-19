@@ -1,0 +1,45 @@
+[gd_scene load_steps=9 format=3 uid="uid://mopmentum_painting"]
+
+[ext_resource type="Script" path="res://scripts/wall_painting.gd" id="1_break"]
+[ext_resource type="ArrayMesh" path="res://assets/models/framed_painting.obj" id="2_mesh"]
+[ext_resource type="Texture2D" path="res://assets/textures/wood_warm_grain.png" id="3_wood"]
+[ext_resource type="Texture2D" path="res://assets/textures/painting_landscape.png" id="4_art"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Frame"]
+albedo_color = Color(0.85, 0.65, 0.45, 1.0)
+albedo_texture = ExtResource("3_wood")
+roughness = 0.5
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="Mat_Canvas"]
+albedo_texture = ExtResource("4_art")
+roughness = 0.8
+diffuse_mode = 3
+
+[sub_resource type="QuadMesh" id="canvas_quad"]
+size = Vector2(0.70, 0.50)
+
+[sub_resource type="BoxShape3D" id="Shape_Col"]
+size = Vector3(0.80, 0.60, 0.06)
+
+[node name="FramedPainting" type="RigidBody3D"]
+mass = 2.5
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_break")
+object_name = "Framed Painting"
+dollar_value = 450
+break_impulse_threshold = 4.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_mesh")
+surface_material_override/0 = SubResource("Mat_Frame")
+
+[node name="CanvasMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.35, -0.015)
+mesh = SubResource("canvas_quad")
+surface_material_override/0 = SubResource("Mat_Canvas")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+shape = SubResource("Shape_Col")

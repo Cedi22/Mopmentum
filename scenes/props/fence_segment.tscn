@@ -1,0 +1,41 @@
+[gd_scene load_steps=5 format=3 uid="uid://fence_segment"]
+
+[sub_resource type="StandardMaterial3D" id="fence_mat"]
+albedo_color = Color(0.58, 0.40, 0.24, 1)
+roughness = 0.9
+diffuse_mode = 3
+
+[sub_resource type="BoxMesh" id="post_mesh"]
+size = Vector3(0.14, 1.0, 0.14)
+
+[sub_resource type="BoxMesh" id="rail_mesh"]
+size = Vector3(1.9, 0.08, 0.06)
+
+[sub_resource type="BoxShape3D" id="col_shape"]
+size = Vector3(1.95, 1.0, 0.2)
+
+[node name="FenceSegment" type="StaticBody3D"]
+
+[node name="Post1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.5, 0)
+mesh = SubResource("post_mesh")
+surface_material_override/0 = SubResource("fence_mat")
+
+[node name="Post2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, 0)
+mesh = SubResource("post_mesh")
+surface_material_override/0 = SubResource("fence_mat")
+
+[node name="RailTop" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("rail_mesh")
+surface_material_override/0 = SubResource("fence_mat")
+
+[node name="RailBottom" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("rail_mesh")
+surface_material_override/0 = SubResource("fence_mat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("col_shape")

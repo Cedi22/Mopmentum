@@ -1,0 +1,75 @@
+[gd_scene load_steps=12 format=3 uid="uid://mopmentum_player_arms"]
+
+[ext_resource type="Script" path="res://scripts/player_arms.gd" id="1_script"]
+[ext_resource type="ArrayMesh" path="res://assets/models/glove_hand_r.obj" id="2_glove_r"]
+[ext_resource type="ArrayMesh" path="res://assets/models/glove_hand_l.obj" id="3_glove_l"]
+[ext_resource type="ArrayMesh" path="res://assets/models/tool_mop.obj" id="4_mop"]
+[ext_resource type="ArrayMesh" path="res://assets/models/tool_sponge.obj" id="5_sponge"]
+[ext_resource type="ArrayMesh" path="res://assets/models/tool_broom.obj" id="6_broom"]
+[ext_resource type="ArrayMesh" path="res://assets/models/tool_spray.obj" id="7_spray"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_RubberGloveYellow"]
+diffuse_mode = 3
+specular_mode = 1
+albedo_color = Color(1.0, 0.84, 0.08, 1.0)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_RubberGloveTeal"]
+diffuse_mode = 3
+specular_mode = 1
+albedo_color = Color(0.12, 0.78, 0.72, 1.0)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_ToolWood"]
+diffuse_mode = 3
+albedo_color = Color(0.85, 0.62, 0.34, 1.0)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_SprayBottle"]
+transparency = 1
+diffuse_mode = 3
+albedo_color = Color(0.25, 0.75, 1.0, 0.88)
+roughness = 0.25
+
+[node name="PlayerArms" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="RightArmPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.26, -0.25, -0.42)
+
+[node name="RightGloveMesh" type="MeshInstance3D" parent="RightArmPivot"]
+mesh = ExtResource("2_glove_r")
+surface_material_override/0 = SubResource("Mat_RubberGloveYellow")
+
+[node name="ToolSocket" type="Node3D" parent="RightArmPivot/RightGloveMesh"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, -0.015, -0.065)
+
+[node name="MopMesh" type="MeshInstance3D" parent="RightArmPivot/RightGloveMesh/ToolSocket"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+mesh = ExtResource("4_mop")
+surface_material_override/0 = SubResource("Mat_ToolWood")
+
+[node name="SpongeMesh" type="MeshInstance3D" parent="RightArmPivot/RightGloveMesh/ToolSocket"]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, -0.04)
+mesh = ExtResource("5_sponge")
+surface_material_override/0 = SubResource("Mat_RubberGloveYellow")
+
+[node name="BroomMesh" type="MeshInstance3D" parent="RightArmPivot/RightGloveMesh/ToolSocket"]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+mesh = ExtResource("6_broom")
+surface_material_override/0 = SubResource("Mat_ToolWood")
+
+[node name="SprayMesh" type="MeshInstance3D" parent="RightArmPivot/RightGloveMesh/ToolSocket"]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08, 0)
+mesh = ExtResource("7_spray")
+surface_material_override/0 = SubResource("Mat_SprayBottle")
+
+[node name="LeftArmPivot" type="Node3D" parent="."]
+transform = Transform3D(0.939693, 0, -0.34202, 0, 1, 0, 0.34202, 0, 0.939693, -0.14, -0.22, -0.42)
+
+[node name="LeftGloveMesh" type="MeshInstance3D" parent="LeftArmPivot"]
+mesh = ExtResource("3_glove_l")
+surface_material_override/0 = SubResource("Mat_RubberGloveTeal")

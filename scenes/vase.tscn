@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://mopmentum_vase"]
+
+[ext_resource type="Script" path="res://scripts/breakable_object.gd" id="1_break"]
+[ext_resource type="ArrayMesh" path="res://assets/models/vase_porcelain.obj" id="2_mesh"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Prop"]
+transparency = 0
+diffuse_mode = 3
+specular_mode = 1
+albedo_color = Color(0.92, 0.95, 1.0, 1.0)
+roughness = 0.15
+
+[sub_resource type="BoxShape3D" id="Shape_Col"]
+size = Vector3(0.32, 0.50, 0.32)
+
+[node name="PorcelainVase" type="RigidBody3D"]
+mass = 1.8
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_break")
+object_name = "Antique Porcelain Vase"
+dollar_value = 250
+break_impulse_threshold = 3.5
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_mesh")
+surface_material_override/0 = SubResource("Mat_Prop")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("Shape_Col")

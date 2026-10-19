@@ -1,0 +1,103 @@
+[gd_scene load_steps=2 format=3 uid="uid://main_menu"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.06, 0.06, 0.1, 1)
+
+[node name="AccentBar" type="ColorRect" parent="."]
+layout_mode = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1280.0
+offset_bottom = 5.0
+color = Color(0.2, 0.6, 1.0, 1)
+
+[node name="TitleLabel" type="Label" parent="."]
+layout_mode = 1
+offset_left = 0.0
+offset_top = 100.0
+offset_right = 1280.0
+offset_bottom = 220.0
+text = "MOPMENTUM"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 96
+theme_override_colors/font_color = Color(0.95, 0.97, 1.0, 1)
+theme_override_colors/font_shadow_color = Color(0.2, 0.5, 1.0, 0.6)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+
+[node name="SubtitleLabel" type="Label" parent="."]
+layout_mode = 1
+offset_left = 0.0
+offset_top = 225.0
+offset_right = 1280.0
+offset_bottom = 275.0
+text = "Clean the house. Fight your movement. Try not to bankrupt yourself."
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.6, 0.7, 0.9, 0.9)
+
+[node name="MopEmoji" type="Label" parent="."]
+layout_mode = 1
+offset_left = 580.0
+offset_top = 400.0
+offset_right = 700.0
+offset_bottom = 500.0
+text = "🧹"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 72
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+offset_left = 490.0
+offset_top = 310.0
+offset_right = 790.0
+offset_bottom = 470.0
+theme_override_constants/separation = 16
+
+[node name="PlayButton" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(300, 55)
+text = "▶  START CLEANING"
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="QuitButton" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(300, 50)
+text = "✕  QUIT (COWARD)"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+
+[node name="ControlsLabel" type="Label" parent="."]
+layout_mode = 1
+offset_left = 0.0
+offset_top = 560.0
+offset_right = 1280.0
+offset_bottom = 620.0
+text = "WASD  Move  ·  Mouse  Look  ·  LMB  Use Tool  ·  Q  Switch  ·  E  Interact  ·  Shift  Sprint  ·  Esc  Pause"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.4, 0.4, 0.6, 0.7)
+
+[node name="VersionLabel" type="Label" parent="."]
+layout_mode = 1
+offset_left = 0.0
+offset_top = 685.0
+offset_right = 1280.0
+offset_bottom = 715.0
+text = "v0.1 — A house cleaning simulator with terrible controls"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.3, 0.3, 0.45, 0.6)

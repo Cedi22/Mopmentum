@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3 uid="uid://milk_carton"]
+
+[ext_resource type="Script" path="res://scripts/breakable_object.gd" id="1_break"]
+
+[sub_resource type="StandardMaterial3D" id="carton_white"]
+albedo_color = Color(0.96, 0.96, 0.98, 1)
+roughness = 0.4
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="carton_cyan"]
+albedo_color = Color(0.18, 0.72, 0.95, 1)
+roughness = 0.4
+diffuse_mode = 3
+
+[sub_resource type="BoxMesh" id="body_mesh"]
+size = Vector3(0.2, 0.3, 0.2)
+
+[sub_resource type="PrismMesh" id="top_mesh"]
+left_to_right = 0.5
+size = Vector3(0.2, 0.1, 0.2)
+
+[sub_resource type="BoxMesh" id="label_mesh"]
+size = Vector3(0.18, 0.16, 0.01)
+
+[sub_resource type="BoxShape3D" id="col_shape"]
+size = Vector3(0.22, 0.4, 0.22)
+
+[node name="MilkCarton" type="RigidBody3D"]
+mass = 0.7
+script = ExtResource("1_break")
+object_type = "milk"
+break_threshold = 5.0
+break_value = 350.0
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("body_mesh")
+surface_material_override/0 = SubResource("carton_white")
+
+[node name="Top" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("top_mesh")
+surface_material_override/0 = SubResource("carton_cyan")
+
+[node name="LabelFront" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0.102)
+mesh = SubResource("label_mesh")
+surface_material_override/0 = SubResource("carton_cyan")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("col_shape")

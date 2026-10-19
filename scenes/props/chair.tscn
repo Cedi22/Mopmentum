@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://props_chair"]
+
+[ext_resource type="Script" path="res://scripts/breakable_object.gd" id="1_break"]
+[ext_resource type="ArrayMesh" path="res://assets/models/chair.obj" id="2_mesh"]
+
+[sub_resource type="StandardMaterial3D" id="chair_wood"]
+albedo_color = Color(0.48, 0.30, 0.16, 1)
+roughness = 0.6
+diffuse_mode = 3
+
+[sub_resource type="BoxShape3D" id="chair_col"]
+size = Vector3(0.50, 0.92, 0.50)
+
+[node name="Chair" type="RigidBody3D"]
+mass = 2.5
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_break")
+object_type = "chair"
+break_threshold = 7.5
+dollar_value = 120.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_mesh")
+surface_material_override/0 = SubResource("chair_wood")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
+shape = SubResource("chair_col")

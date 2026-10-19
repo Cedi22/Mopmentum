@@ -1,0 +1,2 @@
+# Add these as Autoloads in Project > Project Settings > Autoload
+# GameManager  ->  res://scripts/game_manager.gd  (singleton name: GameManager)

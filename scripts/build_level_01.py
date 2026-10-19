@@ -1,0 +1,825 @@
+#!/usr/bin/env python3
+"""
+scripts/build_level_01.py
+Constructs the complete, polished Mopmentum level with:
+  - Custom 3D furniture models (Bookshelf, Coffee Table, Chairs)
+  - Dedicated 3D props (Porcelain Vases, CRT TV, Lamps, Drinking Glasses, Paintings)
+  - Properly aligned dirt spots on tables, chairs, counters, and floors (no floating!)
+  - Invisible boundary walls preventing falling off the map
+  - Safe physics debris and glass window interactions
+"""
+
+import os
+import re
+
+def build_level():
+    level_path = r"c:/Users/visita/OneDrive/Documents/Desktop/Test/Mopmentum/levels/level_01.tscn"
+    
+    tscn_content = """[gd_scene load_steps=120 format=3 uid="uid://level01"]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="2_hud"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="3_pause"]
+[ext_resource type="PackedScene" path="res://scenes/game_over.tscn" id="4_gameover"]
+[ext_resource type="Script" path="res://scripts/level_manager.gd" id="5_lm"]
+[ext_resource type="Script" path="res://scripts/breakable_object.gd" id="6_break"]
+[ext_resource type="Script" path="res://scripts/dirt_spot.gd" id="7_dirt"]
+[ext_resource type="Environment" path="res://assets/materials/default_env.tres" id="8_env"]
+[ext_resource type="PackedScene" path="res://scenes/props/tree_muck.tscn" id="9_muck_tree"]
+[ext_resource type="PackedScene" path="res://scenes/props/tree_birch.tscn" id="10_birch_tree"]
+[ext_resource type="PackedScene" path="res://scenes/props/rock_boulder.tscn" id="11_rock"]
+[ext_resource type="PackedScene" path="res://scenes/props/rock_small.tscn" id="12_small_rock"]
+[ext_resource type="PackedScene" path="res://scenes/props/mushroom_red.tscn" id="13_mush_red"]
+[ext_resource type="PackedScene" path="res://scenes/props/mushroom_blue.tscn" id="14_mush_blue"]
+[ext_resource type="PackedScene" path="res://scenes/props/milk_carton.tscn" id="15_milk"]
+[ext_resource type="PackedScene" path="res://scenes/props/caution_sign.tscn" id="16_caution"]
+[ext_resource type="PackedScene" path="res://scenes/props/golden_trophy.tscn" id="17_trophy"]
+[ext_resource type="PackedScene" path="res://scenes/props/coffee_mug.tscn" id="18_mug"]
+[ext_resource type="PackedScene" path="res://scenes/props/wooden_barrel.tscn" id="19_barrel"]
+[ext_resource type="PackedScene" path="res://scenes/props/wooden_chest.tscn" id="20_chest"]
+[ext_resource type="PackedScene" path="res://scenes/props/lowpoly_cloud.tscn" id="21_cloud"]
+[ext_resource type="PackedScene" path="res://scenes/props/fence_segment.tscn" id="22_fence"]
+[ext_resource type="Script" path="res://scripts/interactive_window.gd" id="23_window"]
+[ext_resource type="PackedScene" path="res://scenes/lamp.tscn" id="24_lamp"]
+[ext_resource type="PackedScene" path="res://scenes/painting.tscn" id="25_painting"]
+[ext_resource type="PackedScene" path="res://scenes/vase.tscn" id="26_vase"]
+[ext_resource type="PackedScene" path="res://scenes/tv.tscn" id="27_tv"]
+[ext_resource type="PackedScene" path="res://scenes/props/chair.tscn" id="28_chair"]
+[ext_resource type="PackedScene" path="res://scenes/props/coffee_table.tscn" id="29_coffeetable"]
+[ext_resource type="PackedScene" path="res://scenes/props/bookshelf.tscn" id="30_bookshelf"]
+[ext_resource type="PackedScene" path="res://scenes/glass.tscn" id="31_glass"]
+
+; =========================================================
+; MATERIALS (FLAT SHADED & VIBRANT MUCK PALETTE)
+; =========================================================
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_color = Color(0.82, 0.62, 0.40, 1)
+roughness = 0.5
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="patio_wood"]
+albedo_color = Color(0.68, 0.48, 0.28, 1)
+roughness = 0.8
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="grass_mat"]
+albedo_color = Color(0.28, 0.72, 0.22, 1)
+roughness = 0.95
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="wall_mat"]
+albedo_color = Color(0.96, 0.94, 0.90, 1)
+roughness = 0.9
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="wall_trim"]
+albedo_color = Color(0.35, 0.22, 0.12, 1)
+roughness = 0.6
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="ceiling_mat"]
+albedo_color = Color(0.94, 0.94, 0.96, 1)
+roughness = 0.9
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="beam_mat"]
+albedo_color = Color(0.45, 0.28, 0.15, 1)
+roughness = 0.7
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="sofa_mat"]
+albedo_color = Color(0.22, 0.52, 0.88, 1)
+roughness = 0.7
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="cushion_mat"]
+albedo_color = Color(0.95, 0.75, 0.20, 1)
+roughness = 0.7
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="table_mat"]
+albedo_color = Color(0.52, 0.35, 0.20, 1)
+roughness = 0.5
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="counter_mat"]
+albedo_color = Color(0.88, 0.88, 0.92, 1)
+roughness = 0.3
+metallic = 0.1
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="stool_wood"]
+albedo_color = Color(0.48, 0.30, 0.16, 1)
+roughness = 0.6
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="rug_mat"]
+albedo_color = Color(0.85, 0.30, 0.25, 1)
+roughness = 0.95
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="glass_window"]
+albedo_color = Color(0.65, 0.85, 1.0, 0.25)
+transparency = 1
+roughness = 0.1
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="bucket_mat"]
+albedo_color = Color(1.0, 0.82, 0.10, 1)
+roughness = 0.3
+metallic = 0.1
+diffuse_mode = 3
+
+; Dirt Materials
+[sub_resource type="StandardMaterial3D" id="dirt_generic"]
+albedo_color = Color(0.38, 0.28, 0.18, 0.85)
+transparency = 1
+roughness = 1.0
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="dirt_mud"]
+albedo_color = Color(0.28, 0.18, 0.10, 0.90)
+transparency = 1
+roughness = 1.0
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="dirt_coffee"]
+albedo_color = Color(0.22, 0.12, 0.06, 0.88)
+transparency = 1
+roughness = 0.8
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="dirt_dust"]
+albedo_color = Color(0.55, 0.52, 0.50, 0.75)
+transparency = 1
+roughness = 1.0
+diffuse_mode = 3
+
+; =========================================================
+; MESH RESOURCES
+; =========================================================
+[sub_resource type="BoxMesh" id="room_floor_mesh"]
+size = Vector3(14, 0.2, 12)
+
+[sub_resource type="BoxShape3D" id="room_floor_col"]
+size = Vector3(14, 0.2, 12)
+
+[sub_resource type="BoxMesh" id="patio_floor_mesh"]
+size = Vector3(14, 0.2, 6)
+
+[sub_resource type="BoxShape3D" id="patio_floor_col"]
+size = Vector3(14, 0.2, 6)
+
+[sub_resource type="BoxMesh" id="outdoor_ground_mesh"]
+size = Vector3(50, 0.3, 50)
+
+[sub_resource type="BoxShape3D" id="outdoor_ground_col"]
+size = Vector3(50, 0.3, 50)
+
+; Map Boundary Barrier Shapes
+[sub_resource type="BoxShape3D" id="boundary_north_south"]
+size = Vector3(60, 16, 1)
+
+[sub_resource type="BoxShape3D" id="boundary_east_west"]
+size = Vector3(1, 16, 60)
+
+[sub_resource type="BoxMesh" id="wall_north_mesh"]
+size = Vector3(14, 3.8, 0.25)
+
+[sub_resource type="BoxShape3D" id="wall_north_col"]
+size = Vector3(14, 3.8, 0.25)
+
+[sub_resource type="BoxMesh" id="wall_side_mesh"]
+size = Vector3(0.25, 3.8, 12)
+
+[sub_resource type="BoxShape3D" id="wall_side_col"]
+size = Vector3(0.25, 3.8, 12)
+
+[sub_resource type="BoxMesh" id="wall_south_pillar"]
+size = Vector3(1.5, 3.8, 0.25)
+
+[sub_resource type="BoxShape3D" id="wall_south_pillar_col"]
+size = Vector3(1.5, 3.8, 0.25)
+
+[sub_resource type="BoxMesh" id="patio_glass_door"]
+size = Vector3(5.5, 3.0, 0.05)
+
+[sub_resource type="BoxShape3D" id="patio_glass_col"]
+size = Vector3(5.5, 3.0, 0.08)
+
+[sub_resource type="BoxMesh" id="ceiling_mesh"]
+size = Vector3(14, 0.2, 12)
+
+[sub_resource type="BoxShape3D" id="ceiling_col"]
+size = Vector3(14, 0.2, 12)
+
+[sub_resource type="BoxMesh" id="ceiling_beam"]
+size = Vector3(14, 0.25, 0.2)
+
+[sub_resource type="BoxMesh" id="sofa_base"]
+size = Vector3(2.6, 0.5, 1.0)
+
+[sub_resource type="BoxShape3D" id="sofa_col"]
+size = Vector3(2.6, 0.5, 1.0)
+
+[sub_resource type="BoxMesh" id="sofa_back"]
+size = Vector3(2.6, 0.8, 0.25)
+
+[sub_resource type="BoxShape3D" id="sofa_back_col"]
+size = Vector3(2.6, 0.8, 0.25)
+
+[sub_resource type="BoxMesh" id="tv_stand"]
+size = Vector3(2.0, 0.5, 0.5)
+
+[sub_resource type="BoxShape3D" id="tv_stand_col"]
+size = Vector3(2.0, 0.5, 0.5)
+
+[sub_resource type="BoxMesh" id="bar_counter"]
+size = Vector3(3.2, 1.05, 0.7)
+
+[sub_resource type="BoxShape3D" id="bar_counter_col"]
+size = Vector3(3.2, 1.05, 0.7)
+
+[sub_resource type="BoxMesh" id="rug_mesh"]
+size = Vector3(3.4, 0.02, 2.4)
+
+[sub_resource type="QuadMesh" id="dirt_quad"]
+size = Vector2(0.75, 0.75)
+
+[sub_resource type="CylinderMesh" id="bucket_mesh"]
+top_radius = 0.24
+bottom_radius = 0.18
+height = 0.38
+radial_segments = 8
+
+[sub_resource type="CylinderShape3D" id="bucket_col"]
+radius = 0.24
+height = 0.38
+
+; =========================================================
+; SCENE HIERARCHY
+; =========================================================
+[node name="Level01" type="Node3D"]
+script = ExtResource("5_lm")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("8_env")
+
+; Sun Light
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)
+shadow_enabled = true
+light_energy = 1.15
+light_color = Color(1.0, 0.98, 0.92, 1)
+
+; Room Main Ambient Light
+[node name="RoomLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_energy = 0.9
+light_color = Color(1.0, 0.96, 0.88, 1)
+omni_range = 14.0
+
+[node name="FillLightKitchen" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 2.6, 2.5)
+light_energy = 0.6
+light_color = Color(1.0, 0.92, 0.82, 1)
+omni_range = 8.0
+
+; --- INDOOR ROOM ---
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("room_floor_mesh")
+surface_material_override/0 = SubResource("floor_mat")
+
+[node name="FloorCol" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("room_floor_col")
+
+; Ceiling
+[node name="Ceiling" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+
+[node name="CeilMesh" type="MeshInstance3D" parent="Ceiling"]
+mesh = SubResource("ceiling_mesh")
+surface_material_override/0 = SubResource("ceiling_mat")
+
+[node name="CeilCol" type="CollisionShape3D" parent="Ceiling"]
+shape = SubResource("ceiling_col")
+
+; Beams
+[node name="Beam1" type="MeshInstance3D" parent="Ceiling"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, -3.0)
+mesh = SubResource("ceiling_beam")
+surface_material_override/0 = SubResource("beam_mat")
+
+[node name="Beam2" type="MeshInstance3D" parent="Ceiling"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0.0)
+mesh = SubResource("ceiling_beam")
+surface_material_override/0 = SubResource("beam_mat")
+
+[node name="Beam3" type="MeshInstance3D" parent="Ceiling"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 3.0)
+mesh = SubResource("ceiling_beam")
+surface_material_override/0 = SubResource("beam_mat")
+
+; Walls
+[node name="WallNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, -6.0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallNorth"]
+mesh = SubResource("wall_north_mesh")
+surface_material_override/0 = SubResource("wall_mat")
+
+[node name="Col" type="CollisionShape3D" parent="WallNorth"]
+shape = SubResource("wall_north_col")
+
+[node name="WallEast" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0, 1.9, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallEast"]
+mesh = SubResource("wall_side_mesh")
+surface_material_override/0 = SubResource("wall_mat")
+
+[node name="Col" type="CollisionShape3D" parent="WallEast"]
+shape = SubResource("wall_side_col")
+
+[node name="WallWest" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0, 1.9, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallWest"]
+mesh = SubResource("wall_side_mesh")
+surface_material_override/0 = SubResource("wall_mat")
+
+[node name="Col" type="CollisionShape3D" parent="WallWest"]
+shape = SubResource("wall_side_col")
+
+; South Panoramic Wall (Pillars + Glass Opening to Patio)
+[node name="WallSouthLeft" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.25, 1.9, 6.0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouthLeft"]
+mesh = SubResource("wall_south_pillar")
+surface_material_override/0 = SubResource("wall_mat")
+
+[node name="Col" type="CollisionShape3D" parent="WallSouthLeft"]
+shape = SubResource("wall_south_pillar_col")
+
+[node name="WallSouthRight" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 1.9, 6.0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouthRight"]
+mesh = SubResource("wall_south_pillar")
+surface_material_override/0 = SubResource("wall_mat")
+
+[node name="Col" type="CollisionShape3D" parent="WallSouthRight"]
+shape = SubResource("wall_south_pillar_col")
+
+; Glass Door to Patio
+[node name="PatioGlass" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.75, 1.6, 6.0)
+script = ExtResource("23_window")
+is_door = true
+
+[node name="Mesh" type="MeshInstance3D" parent="PatioGlass"]
+mesh = SubResource("patio_glass_door")
+surface_material_override/0 = SubResource("glass_window")
+
+[node name="Col" type="CollisionShape3D" parent="PatioGlass"]
+shape = SubResource("patio_glass_col")
+
+; Left Glass Window to Patio
+[node name="PatioGlassLeft" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.75, 1.6, 6.0)
+script = ExtResource("23_window")
+is_door = false
+
+[node name="Mesh" type="MeshInstance3D" parent="PatioGlassLeft"]
+mesh = SubResource("patio_glass_door")
+surface_material_override/0 = SubResource("glass_window")
+
+[node name="Col" type="CollisionShape3D" parent="PatioGlassLeft"]
+shape = SubResource("patio_glass_col")
+
+; --- PATIO & OUTDOORS (MUCK WORLD) ---
+[node name="PatioFloor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.0)
+
+[node name="Mesh" type="MeshInstance3D" parent="PatioFloor"]
+mesh = SubResource("patio_floor_mesh")
+surface_material_override/0 = SubResource("patio_wood")
+
+[node name="Col" type="CollisionShape3D" parent="PatioFloor"]
+shape = SubResource("patio_floor_col")
+
+[node name="OutdoorGround" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 14.0)
+
+[node name="Mesh" type="MeshInstance3D" parent="OutdoorGround"]
+mesh = SubResource("outdoor_ground_mesh")
+surface_material_override/0 = SubResource("grass_mat")
+
+[node name="Col" type="CollisionShape3D" parent="OutdoorGround"]
+shape = SubResource("outdoor_ground_col")
+
+; --- INVISIBLE BOUNDARY BARRIERS (NEVER FALL OFF THE MAP!) ---
+[node name="BoundaryNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0, -12.0)
+
+[node name="Col" type="CollisionShape3D" parent="BoundaryNorth"]
+shape = SubResource("boundary_north_south")
+
+[node name="BoundarySouth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0, 36.0)
+
+[node name="Col" type="CollisionShape3D" parent="BoundarySouth"]
+shape = SubResource("boundary_north_south")
+
+[node name="BoundaryEast" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.0, 6.0, 12.0)
+
+[node name="Col" type="CollisionShape3D" parent="BoundaryEast"]
+shape = SubResource("boundary_east_west")
+
+[node name="BoundaryWest" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0, 6.0, 12.0)
+
+[node name="Col" type="CollisionShape3D" parent="BoundaryWest"]
+shape = SubResource("boundary_east_west")
+
+; Patio Fences
+[node name="FenceSouth1" parent="." instance=ExtResource("22_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.0, 0.1, 12.0)
+
+[node name="FenceSouth2" parent="." instance=ExtResource("22_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1, 0.1, 12.0)
+
+[node name="FenceSouth3" parent="." instance=ExtResource("22_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1, 0.1, 12.0)
+
+[node name="FenceSouth4" parent="." instance=ExtResource("22_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0, 0.1, 12.0)
+
+; Outdoor Muck Trees
+[node name="Tree1" parent="." instance=ExtResource("9_muck_tree")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, -9.0, 0.0, 16.0)
+
+[node name="Tree2" parent="." instance=ExtResource("9_muck_tree")]
+transform = Transform3D(0.9, 0, 0.4, 0, 1.0, 0, -0.4, 0, 0.9, 8.5, 0.0, 15.0)
+
+[node name="Tree3" parent="." instance=ExtResource("9_muck_tree")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0.0, 0.0, 22.0)
+
+[node name="Birch1" parent="." instance=ExtResource("10_birch_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.0, 18.0)
+
+[node name="Birch2" parent="." instance=ExtResource("10_birch_tree")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0, 0.0, 19.0)
+
+; Outdoor Muck Rocks & Boulders
+[node name="Boulder1" parent="." instance=ExtResource("11_rock")]
+transform = Transform3D(1.3, 0, 0.4, 0, 1.1, 0, -0.4, 0, 1.3, -3.5, 0.0, 15.5)
+
+[node name="Boulder2" parent="." instance=ExtResource("11_rock")]
+transform = Transform3D(0.9, 0, -0.5, 0, 0.9, 0, 0.5, 0, 0.9, 4.2, 0.0, 16.0)
+
+[node name="SmallRock1" parent="." instance=ExtResource("12_small_rock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.0, 13.5)
+
+[node name="SmallRock2" parent="." instance=ExtResource("12_small_rock")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 2.5, 0.0, 14.0)
+
+; Outdoor Mushrooms
+[node name="ShroomRed1" parent="." instance=ExtResource("13_mush_red")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.0, 14.2)
+
+[node name="ShroomRed2" parent="." instance=ExtResource("13_mush_red")]
+transform = Transform3D(0.8, 0, 0.2, 0, 0.8, 0, -0.2, 0, 0.8, -4.8, 0.0, 15.0)
+
+[node name="ShroomBlue1" parent="." instance=ExtResource("14_mush_blue")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 3.5, 0.0, 14.5)
+
+[node name="ShroomBlue2" parent="." instance=ExtResource("14_mush_blue")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 5.2, 0.0, 17.0)
+
+; Low-poly Cartoon Clouds Floating in Sky
+[node name="Cloud1" parent="." instance=ExtResource("21_cloud")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -8.0, 12.0, 15.0)
+
+[node name="Cloud2" parent="." instance=ExtResource("21_cloud")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 10.0, 14.0, 25.0)
+
+[node name="Cloud3" parent="." instance=ExtResource("21_cloud")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0.0, 15.0, 30.0)
+
+; --- INTERIOR LIVING AREA ---
+; Rug
+[node name="Rug" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.11, -1.8)
+
+[node name="Mesh" type="MeshInstance3D" parent="Rug"]
+mesh = SubResource("rug_mesh")
+surface_material_override/0 = SubResource("rug_mat")
+
+; Sofa
+[node name="Sofa" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.25, -3.8)
+
+[node name="SofaBase" type="MeshInstance3D" parent="Sofa"]
+mesh = SubResource("sofa_base")
+surface_material_override/0 = SubResource("sofa_mat")
+
+[node name="SofaCol" type="CollisionShape3D" parent="Sofa"]
+shape = SubResource("sofa_col")
+
+[node name="SofaBack" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.9, -4.275)
+
+[node name="BackMesh" type="MeshInstance3D" parent="SofaBack"]
+mesh = SubResource("sofa_back")
+surface_material_override/0 = SubResource("sofa_mat")
+
+[node name="BackCol" type="CollisionShape3D" parent="SofaBack"]
+shape = SubResource("sofa_back_col")
+
+; Cushions (RigidBody3D)
+[node name="Cushion1" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.55, -3.8)
+mass = 0.4
+script = ExtResource("6_break")
+object_type = "generic"
+break_threshold = 20.0
+
+[node name="Mesh" type="MeshInstance3D" parent="Cushion1"]
+mesh = SubResource("sofa_back")
+scale = Vector3(0.35, 0.5, 0.8)
+surface_material_override/0 = SubResource("cushion_mat")
+
+[node name="Col" type="CollisionShape3D" parent="Cushion1"]
+shape = SubResource("sofa_back_col")
+scale = Vector3(0.35, 0.5, 0.8)
+
+[node name="Cushion2" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.55, -3.8)
+mass = 0.4
+script = ExtResource("6_break")
+object_type = "generic"
+break_threshold = 20.0
+
+[node name="Mesh" type="MeshInstance3D" parent="Cushion2"]
+mesh = SubResource("sofa_back")
+scale = Vector3(0.35, 0.5, 0.8)
+surface_material_override/0 = SubResource("cushion_mat")
+
+[node name="Col" type="CollisionShape3D" parent="Cushion2"]
+shape = SubResource("sofa_back_col")
+scale = Vector3(0.35, 0.5, 0.8)
+
+; Stylized Custom 3D Coffee Table
+[node name="CoffeeTable" parent="." instance=ExtResource("29_coffeetable")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.0, -2.0)
+
+; Breakables on Coffee Table (Sitting cleanly on tabletop y=0.44)
+[node name="CoffeeMug1" parent="." instance=ExtResource("18_mug")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 0.44, -2.1)
+
+[node name="CoffeeMug2" parent="." instance=ExtResource("18_mug")]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, -1.5, 0.44, -1.9)
+
+[node name="DrinkingGlass1" parent="." instance=ExtResource("31_glass")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0.44, -2.1)
+
+[node name="AntiqueVase" parent="." instance=ExtResource("26_vase")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -1.8, 0.44, -2.0)
+
+; TV Entertainment Console
+[node name="TVStand" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.25, 0.8)
+
+[node name="Mesh" type="MeshInstance3D" parent="TVStand"]
+mesh = SubResource("tv_stand")
+surface_material_override/0 = SubResource("table_mat")
+
+[node name="Col" type="CollisionShape3D" parent="TVStand"]
+shape = SubResource("tv_stand_col")
+
+; CRT TV (Detailed 3D Model with dials & antennae!)
+[node name="TV" parent="." instance=ExtResource("27_tv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.50, 0.8)
+
+; Floor Lamp (Interactive & Breakable with 3D model!)
+[node name="FloorLamp" parent="." instance=ExtResource("24_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.0, -4.2)
+
+; Detailed 3D Bookshelf (Rotated 90 deg flush against West Wall)
+[node name="Bookshelf" parent="." instance=ExtResource("30_bookshelf")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -6.67, 0.0, -2.0)
+
+; Porcelain Vase 2 on Bookshelf Shelf 3 (Sitting securely flush on shelf y=1.16!)
+[node name="VaseBookshelf" parent="." instance=ExtResource("26_vase")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, -6.65, 1.16, -1.70)
+
+; Breakable Wall Paintings (Framed canvas 3D models securely hung)
+[node name="PaintingDani" parent="." instance=ExtResource("25_painting")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 2.2, -5.85)
+
+[node name="PaintingMilk" parent="." instance=ExtResource("25_painting")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.2, -5.85)
+
+; --- SNACK BAR / KITCHENETTE (RIGHT SIDE) ---
+[node name="BarCounter" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.525, -2.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="BarCounter"]
+mesh = SubResource("bar_counter")
+surface_material_override/0 = SubResource("counter_mat")
+
+[node name="Col" type="CollisionShape3D" parent="BarCounter"]
+shape = SubResource("bar_counter_col")
+
+; Detailed Dining Chairs at Counter
+[node name="Chair1" parent="." instance=ExtResource("28_chair")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.0, -1.6)
+
+[node name="Chair2" parent="." instance=ExtResource("28_chair")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0.0, -1.6)
+
+; Breakable Milk Cartons on Bar Counter (y=1.05)
+[node name="MilkCarton1" parent="." instance=ExtResource("15_milk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 1.05, -2.5)
+
+[node name="MilkCarton2" parent="." instance=ExtResource("15_milk")]
+transform = Transform3D(0.94, 0, 0.34, 0, 1, 0, -0.34, 0, 0.94, 4.2, 1.05, -2.4)
+
+[node name="MilkCarton3" parent="." instance=ExtResource("15_milk")]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 5.2, 1.05, -2.6)
+
+[node name="DrinkingGlass2" parent="." instance=ExtResource("31_glass")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 1.05, -2.5)
+
+; Prestigious Golden Mop Trophy ($300 Fragile Award!)
+[node name="TrophyPedestal" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0.45, -4.5)
+
+[node name="Mesh" type="MeshInstance3D" parent="TrophyPedestal"]
+mesh = SubResource("bar_counter")
+scale = Vector3(0.25, 0.9, 0.25)
+surface_material_override/0 = SubResource("wall_trim")
+
+[node name="GoldenTrophy" parent="." instance=ExtResource("17_trophy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0.9, -4.5)
+
+; Muck Wooden Barrel & Textured Storage Chest in Corner
+[node name="Barrel1" parent="." instance=ExtResource("19_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0.1, 3.5)
+
+[node name="MuckChest1" parent="." instance=ExtResource("20_chest")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.8, 0.0, 2.2)
+
+; Caution Wet Floor Signs!
+[node name="CautionSign1" parent="." instance=ExtResource("16_caution")]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -0.5, 0.1, 1.8)
+
+[node name="CautionSign2" parent="." instance=ExtResource("16_caution")]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 1.8, 0.1, 4.5)
+
+; Cleaning Bucket
+[node name="CleanBucket" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0.16, 2.5)
+mass = 2.0
+
+[node name="Mesh" type="MeshInstance3D" parent="CleanBucket"]
+mesh = SubResource("bucket_mesh")
+surface_material_override/0 = SubResource("bucket_mat")
+
+[node name="Col" type="CollisionShape3D" parent="CleanBucket"]
+shape = SubResource("bucket_col")
+
+; =========================================================
+; DIRT SPOTS (CLEANING OBJECTIVES)
+; =========================================================
+; 1. Muddy footprints from patio (Mop / Mud)
+[node name="Dirt_1" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0, 0.01, 5.2)
+
+; 2. Muddy footprint 2
+[node name="Dirt_2" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.01, 4.2)
+
+; 3. Muddy footprint on patio deck
+[node name="Dirt_3" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.01, 7.5)
+
+; 4. Spilled Milk puddle by Bar (Liquid / Mop)
+[node name="Dirt_4" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 4
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0.01, -1.2)
+
+; 5. Coffee mug rings & syrup ON Coffee Table (Sponge / Spray)
+[node name="Dirt_5" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7, 0.445, -1.95)
+
+; 6. Trash pile under TV stand (Broom)
+[node name="Dirt_6" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.01, 1.4)
+
+; 7. Trash pile near Bookshelf (Broom)
+[node name="Dirt_7" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.6, 0.01, -2.8)
+
+; 8. Sticky drink rings ON Bar Counter (Sponge / Spray)
+[node name="Dirt_8" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0, 1.055, -2.45)
+
+; 9. Dirty brown floor mud patch (Mop)
+[node name="Dirt_9" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.01, 0.0)
+
+; 10. Dirty brown floor mud patch 2 (Mop)
+[node name="Dirt_10" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.01, -0.5)
+
+; 11. Mud patch near entrance (Mop)
+[node name="Dirt_11" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.01, 3.2)
+
+; 12. Kitchen grease & syrup ON Bar Counter (Sponge / Spray)
+[node name="Dirt_12" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0, 1.055, -2.55)
+
+; 13. Mud patch on patio near tree (Mop)
+[node name="Dirt_13" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.01, 8.5)
+
+; 14. Dust patch near sofa back (Broom)
+[node name="Dirt_14" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0.01, -4.0)
+
+; 15. Liquid puddle near caution sign (Mop)
+[node name="Dirt_15" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 4
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.01, 4.0)
+
+; 16. Sticky coffee ring ON Chair 1 Seat (Sponge / Spray)
+[node name="Dirt_16" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.445, -1.6)
+
+; 17. Dried stain ON Bookshelf lower shelf (Sponge / Spray)
+[node name="Dirt_17" type="Node3D" parent="."]
+script = ExtResource("7_dirt")
+dirt_type = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.60, 0.665, -2.15)
+
+; --- PLAYER SPAWN ---
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 2.5)
+
+; --- HUD & MENUS ---
+[node name="HUD" parent="." instance=ExtResource("2_hud")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("3_pause")]
+visible = false
+
+[node name="GameOverScreen" parent="." instance=ExtResource("4_gameover")]
+visible = false
+"""
+    sub_resources = len(re.findall(r'\[sub_resource ', tscn_content))
+    ext_resources = len(re.findall(r'\[ext_resource ', tscn_content))
+    actual_steps = sub_resources + ext_resources + 1
+    tscn_content = re.sub(r'load_steps=\d+', f'load_steps={actual_steps}', tscn_content)
+    with open(level_path, "w", encoding="utf-8") as f:
+        f.write(tscn_content)
+    print(f"[SUCCESS] Built level_01.tscn (load_steps={actual_steps}) with custom 3D furniture, proper dirt, and safety barriers!")
+
+if __name__ == "__main__":
+    build_level()

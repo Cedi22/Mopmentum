@@ -1,0 +1,28 @@
+[gd_resource type="Environment" load_steps=3 format=3]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_muck"]
+sky_top_color = Color(0.28, 0.62, 0.96, 1)
+sky_horizon_color = Color(0.72, 0.86, 0.98, 1)
+ground_bottom_color = Color(0.24, 0.48, 0.20, 1)
+ground_horizon_color = Color(0.52, 0.76, 0.42, 1)
+sun_angle_max = 35.0
+
+[sub_resource type="Sky" id="Sky_muck"]
+sky_material = SubResource("ProceduralSkyMaterial_muck")
+
+[resource]
+background_mode = 2
+sky = SubResource("Sky_muck")
+ambient_light_source = 3
+ambient_light_color = Color(0.92, 0.94, 0.98, 1)
+ambient_light_sky_contribution = 0.65
+ambient_light_energy = 0.85
+tonemap_mode = 2
+tonemap_white = 1.1
+ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 1.4
+glow_enabled = true
+glow_intensity = 0.25
+glow_strength = 0.8
+glow_bloom = 0.05

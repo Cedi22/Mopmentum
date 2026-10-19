@@ -1,0 +1,47 @@
+[gd_scene load_steps=8 format=3 uid="uid://mopmentum_tv"]
+
+[ext_resource type="Script" path="res://scripts/breakable_object.gd" id="1_break"]
+[ext_resource type="ArrayMesh" path="res://assets/models/retro_tv.obj" id="2_mesh"]
+[ext_resource type="Texture2D" path="res://assets/textures/tv_screen_retro.png" id="3_screen_tex"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Prop"]
+transparency = 0
+diffuse_mode = 3
+specular_mode = 1
+albedo_color = Color(0.28, 0.30, 0.34, 1.0)
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="Mat_Screen"]
+albedo_texture = ExtResource("3_screen_tex")
+emission_enabled = true
+emission = Color(0.3, 0.3, 0.35, 1)
+emission_energy_multiplier = 0.8
+roughness = 0.2
+
+[sub_resource type="QuadMesh" id="screen_quad"]
+size = Vector2(0.38, 0.30)
+
+[sub_resource type="BoxShape3D" id="Shape_Col"]
+size = Vector3(0.56, 0.44, 0.48)
+
+[node name="RetroTV" type="RigidBody3D"]
+mass = 12.0
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_break")
+object_name = "CRT Television"
+dollar_value = 400
+break_impulse_threshold = 8.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_mesh")
+surface_material_override/0 = SubResource("Mat_Prop")
+
+[node name="ScreenMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.05, 0.23, -0.206)
+mesh = SubResource("screen_quad")
+surface_material_override/0 = SubResource("Mat_Screen")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
+shape = SubResource("Shape_Col")

@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3 uid="uid://lowpoly_cloud"]
+
+[sub_resource type="StandardMaterial3D" id="cloud_mat"]
+albedo_color = Color(0.98, 0.98, 1.0, 1)
+roughness = 1.0
+diffuse_mode = 3
+
+[sub_resource type="SphereMesh" id="cloud_sphere1"]
+radius = 2.0
+height = 2.4
+radial_segments = 6
+rings = 4
+
+[sub_resource type="SphereMesh" id="cloud_sphere2"]
+radius = 1.5
+height = 1.8
+radial_segments = 6
+rings = 4
+
+[sub_resource type="SphereMesh" id="cloud_sphere3"]
+radius = 1.3
+height = 1.6
+radial_segments = 6
+rings = 4
+
+[node name="LowPolyCloud" type="Node3D"]
+
+[node name="Puff1" type="MeshInstance3D" parent="."]
+mesh = SubResource("cloud_sphere1")
+surface_material_override/0 = SubResource("cloud_mat")
+
+[node name="Puff2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, -0.3, 0.2)
+mesh = SubResource("cloud_sphere2")
+surface_material_override/0 = SubResource("cloud_mat")
+
+[node name="Puff3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.2, -0.2)
+mesh = SubResource("cloud_sphere3")
+surface_material_override/0 = SubResource("cloud_mat")

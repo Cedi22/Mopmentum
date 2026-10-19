@@ -1,0 +1,56 @@
+[gd_scene load_steps=2 format=3 uid="uid://gameover"]
+
+[ext_resource type="Script" path="res://scripts/game_over_screen.gd" id="1_go"]
+
+[node name="GameOverScreen" type="CanvasLayer"]
+script = ExtResource("1_go")
+layer = 20
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.02, 0.05, 0.85)
+mouse_filter = 0
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 340.0
+offset_top = 130.0
+offset_right = 940.0
+offset_bottom = 590.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 570.0
+offset_bottom = 430.0
+theme_override_constants/separation = 20
+
+[node name="ReasonLabel" type="Label" parent="Panel/VBox"]
+custom_minimum_size = Vector2(540, 120)
+text = "GAME OVER"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(1.0, 0.3, 0.1, 1)
+autowrap_mode = 3
+
+[node name="ScoreLabel" type="Label" parent="Panel/VBox"]
+custom_minimum_size = Vector2(540, 100)
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+autowrap_mode = 3
+
+[node name="RestartButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(300, 50)
+text = "↻  TRY AGAIN"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="MenuButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(300, 50)
+text = "⌂  MAIN MENU"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)

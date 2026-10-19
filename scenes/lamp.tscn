@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://mopmentum_lamp"]
+
+[ext_resource type="Script" path="res://scripts/interactive_lamp.gd" id="1_break"]
+[ext_resource type="ArrayMesh" path="res://assets/models/table_lamp.obj" id="2_mesh"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Prop"]
+transparency = 0
+diffuse_mode = 3
+specular_mode = 1
+albedo_color = Color(1.0, 0.88, 0.42, 1.0)
+roughness = 0.45
+
+[sub_resource type="BoxShape3D" id="Shape_Col"]
+size = Vector3(0.40, 0.52, 0.40)
+
+[node name="TableLamp" type="RigidBody3D"]
+mass = 2.2
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_break")
+object_name = "Table Lamp"
+dollar_value = 180.0
+break_threshold = 3.5
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_mesh")
+surface_material_override/0 = SubResource("Mat_Prop")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+shape = SubResource("Shape_Col")
+
+[node name="LampLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_color = Color(1.0, 0.92, 0.75, 1)
+light_energy = 1.2
+omni_range = 5.0

@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://breakable"]
+
+[ext_resource type="Script" path="res://scripts/breakable_object.gd" id="1_break"]
+
+[sub_resource type="BoxShape3D" id="box_shape"]
+size = Vector3(0.3, 0.4, 0.3)
+
+[node name="BreakableObject" type="RigidBody3D"]
+script = ExtResource("1_break")
+mass = 1.5
+
+[node name="ObjectMesh" type="MeshInstance3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("box_shape")

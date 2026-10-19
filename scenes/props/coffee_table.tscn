@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://props_coffeetable"]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/coffee_table.obj" id="1_mesh"]
+
+[sub_resource type="StandardMaterial3D" id="table_mat"]
+albedo_color = Color(0.55, 0.36, 0.20, 1)
+roughness = 0.5
+diffuse_mode = 3
+
+[sub_resource type="BoxShape3D" id="table_col"]
+size = Vector3(1.36, 0.44, 0.72)
+
+[node name="CoffeeTable" type="StaticBody3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_mesh")
+surface_material_override/0 = SubResource("table_mat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
+shape = SubResource("table_col")

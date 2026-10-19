@@ -1,0 +1,48 @@
+[gd_scene load_steps=7 format=3 uid="uid://caution_sign"]
+
+[ext_resource type="Script" path="res://scripts/breakable_object.gd" id="1_break"]
+
+[sub_resource type="StandardMaterial3D" id="yellow_mat"]
+albedo_color = Color(0.98, 0.84, 0.08, 1)
+roughness = 0.5
+diffuse_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="black_symbol"]
+albedo_color = Color(0.12, 0.12, 0.12, 1)
+roughness = 0.8
+diffuse_mode = 3
+
+[sub_resource type="BoxMesh" id="board_mesh"]
+size = Vector3(0.3, 0.52, 0.03)
+
+[sub_resource type="BoxMesh" id="symbol_mesh"]
+size = Vector3(0.16, 0.16, 0.005)
+
+[sub_resource type="BoxShape3D" id="col_shape"]
+size = Vector3(0.32, 0.55, 0.28)
+
+[node name="CautionSign" type="RigidBody3D"]
+mass = 1.0
+script = ExtResource("1_break")
+object_type = "caution_sign"
+break_threshold = 6.0
+break_value = 120.0
+
+[node name="LegLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.985, -0.174, 0, 0.174, 0.985, 0, 0.26, -0.07)
+mesh = SubResource("board_mesh")
+surface_material_override/0 = SubResource("yellow_mat")
+
+[node name="LegRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 0.26, 0.07)
+mesh = SubResource("board_mesh")
+surface_material_override/0 = SubResource("yellow_mat")
+
+[node name="WarningSymbol" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.707, -0.707, 0, 0.696, 0.696, 0.174, -0.123, -0.123, 0.985, 0, 0.28, 0.09)
+mesh = SubResource("symbol_mesh")
+surface_material_override/0 = SubResource("black_symbol")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27, 0)
+shape = SubResource("col_shape")
